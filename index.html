@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Console</title>
+    <style>
+      #console {
+        background-color: black;
+        color: white;
+        height: 300px;
+        overflow: auto;
+        font-family: monospace;
+      }
+      
+    </style>
+  </head>
+  <body>
+  <div id="console"></div>
+    <script>
+const consoleDiv = document.getElementById("console");
+const inputDiv = document.createElement("div");
+inputDiv.style.display = "flex";
+inputDiv.style.backgroundColor = "black";
+inputDiv.style.padding = "10px";
+inputDiv.style.marginTop = "10px";
+inputDiv.style.alignItems = "center";
+
+
+const input = document.createElement("textarea");
+input.rows = 1;
+input.style.flexGrow = "1";
+input.style.marginRight = "10px";
+input.style.padding = "5px";
+input.style.backgroundColor = "transparent";
+input.style.border = "none";
+input.style.color = "white";
+input.placeholder = "Type JavaScript code and press Enter to run";
+input.style.resize = "none";
+input.style.outline = "none";
+input.style.overflow = "hidden";
+
+
+const submit = document.createElement("button");
+submit.textContent = "Run";
+submit.style.display = "none";
+
+inputDiv.appendChild(input);
+inputDiv.appendChild(submit);
+
+consoleDiv.appendChild(inputDiv);
+
+function logToConsole(text) {
+  const p = document.createElement("p");
+  p.textContent = text;
+  consoleDiv.appendChild(p);
+}
+
+input.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.ctrlKey) {
+    event.preventDefault();
+    const inputText = input.value;
+    try {
+      const result = eval(inputText);
+      logToConsole(result);
+    } catch (error) {
+      console.error(error);
+      logToConsole(`ERROR: ${error}`);
+    }
+    input.value = "";
+  } else if (event.key === "Enter" && event.ctrlKey) {
+    input.value += "\n";
+  }
+});
+
+console.log = (text) => logToConsole(text);
+console.warn = (text) => logToConsole(`WARNING: ${text}`);
+console.error = (text) => logToConsole(`ERROR: ${text}`);
+
+let menu;
+let hideMenu;
+
+document.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+
+  if (menu) {
+    menu.remove();
+  }
+
+  menu = document.createElement("div");
+  menu.style.position = "absolute";
+  menu.style.top = `${event.clientY}px`;
+  menu.style.left = `${event.clientX}px`;
+  menu.style.backgroundColor = "white";
+  menu.style.border = "1px solid black";
+  menu.style.padding = "5px";
+
+  const showOption = document.createElement("div");
+  showOption.textContent = "Show Console";
+  showOption.style.cursor = "pointer";
+  showOption.addEventListener("click", () => {
+    consoleDiv.style.display = "block";
+    menu.remove();
+  });
+  menu.appendChild(showOption);
+
+  const hideOption = document.createElement("div");
+  hideOption.textContent = "Hide Console";
+  hideOption.style.cursor = "pointer";
+  hideOption.addEventListener("click", () => {
+    consoleDiv.style.display = "none";
+    menu.remove();
+  });
+  menu.appendChild(hideOption);
+
+  document.body.appendChild(menu);
+
+  if (hideMenu) {
+    document.removeEventListener("contextmenu", hideMenu);
+  }
+
+  hideMenu = () => {
+    menu.remove();
+    document.removeEventListener("contextmenu", hideMenu);
+  };
+  document.addEventListener("contextmenu", hideMenu, { once: true });
+});
+
+    </script>
+  </body>
+</html>
